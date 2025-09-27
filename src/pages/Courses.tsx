@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useNavigate } from 'react-router-dom';
+import courseAnnualReport from '@/assets/course-annual-report.jpg';
+import courseDataViz from '@/assets/course-data-viz.jpg';
+import courseStrategy from '@/assets/course-strategy.jpg';
+import courseFinance from '@/assets/course-finance.jpg';
 
 const courses = [
   {
@@ -17,7 +22,7 @@ const courses = [
     rating: 4.8,
     category: 'Analytics',
     level: 'Intermediate',
-    thumbnail: 'bg-gradient-primary'
+    thumbnail: courseAnnualReport
   },
   {
     id: 2,
@@ -30,7 +35,7 @@ const courses = [
     rating: 4.9,
     category: 'Visualization',
     level: 'Beginner',
-    thumbnail: 'bg-gradient-success'
+    thumbnail: courseDataViz
   },
   {
     id: 3,
@@ -43,7 +48,7 @@ const courses = [
     rating: 4.7,
     category: 'Strategy',
     level: 'Advanced',
-    thumbnail: 'bg-gradient-secondary'
+    thumbnail: courseStrategy
   },
   {
     id: 4,
@@ -56,11 +61,16 @@ const courses = [
     rating: 4.6,
     category: 'Finance',
     level: 'Advanced',
-    thumbnail: 'bg-gradient-hero'
+    thumbnail: courseFinance
   }
 ];
 
 export default function Courses() {
+  const navigate = useNavigate();
+
+  const handleCreateCourse = () => {
+    navigate('/courses/create');
+  };
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -69,7 +79,7 @@ export default function Courses() {
           <h1 className="text-3xl font-bold text-foreground">Course Management</h1>
           <p className="text-muted-foreground mt-2">Manage learning modules and annual report analytics courses</p>
         </div>
-        <Button variant="gradient" size="lg">
+        <Button variant="gradient" size="lg" onClick={handleCreateCourse}>
           <Plus className="mr-2 h-5 w-5" />
           Create Course
         </Button>
@@ -81,8 +91,13 @@ export default function Courses() {
           <Card key={course.id} className="bg-gradient-card shadow-elegant hover:shadow-elegant-lg transition-all duration-300 border-border/50 group">
             <CardHeader className="pb-4">
               {/* Course Thumbnail */}
-              <div className={`h-32 rounded-lg ${course.thumbnail} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                <BookOpen className="h-12 w-12 text-white" />
+              <div className="h-32 rounded-lg overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300 relative">
+                <img 
+                  src={course.thumbnail} 
+                  alt={course.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
               </div>
               
               <div className="space-y-2">

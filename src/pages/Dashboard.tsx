@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users, BookOpen, TrendingUp, Award, Calendar, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import StatsCard from '@/components/dashboard/StatsCard';
 import AnalyticsChart from '@/components/charts/AnalyticsChart';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,7 @@ const recentActivities = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   return (
     <div className="p-6 space-y-6">
       {/* Hero Section */}
@@ -67,10 +69,10 @@ export default function Dashboard() {
               Comprehensive Learning Management System with integrated Annual Report Analytics
             </p>
             <div className="flex space-x-4">
-              <Button variant="hero" size="lg">
+              <Button variant="hero" size="lg" onClick={() => navigate('/courses')}>
                 Explore Courses
               </Button>
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary">
+              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-primary" onClick={() => navigate('/analytics')}>
                 View Analytics
               </Button>
             </div>
@@ -172,21 +174,25 @@ export default function Dashboard() {
               <CardDescription>Common tasks and shortcuts</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button variant="gradient" className="w-full justify-start">
+              <Button variant="gradient" className="w-full justify-start" onClick={() => navigate('/courses/create')}>
                 <BookOpen className="mr-2 h-4 w-4" />
                 Create New Course
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/students')}>
                 <Users className="mr-2 h-4 w-4" />
                 Add Students
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/reports')}>
                 <TrendingUp className="mr-2 h-4 w-4" />
                 Generate Report
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/calendar')}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Schedule Meeting
+              </Button>
+              <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/evaluation')}>
+                <Award className="mr-2 h-4 w-4" />
+                Digital Evaluation
               </Button>
               
               <div className="pt-4 border-t">
