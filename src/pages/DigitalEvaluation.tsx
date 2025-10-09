@@ -90,6 +90,20 @@ export default function DigitalEvaluation() {
     });
   };
 
+  const handleAutoGrade = (evaluationId: number) => {
+    toast({
+      title: "Auto-Grading Started",
+      description: "AI-powered grading is processing the submission.",
+    });
+  };
+
+  const handleBulkGrade = () => {
+    toast({
+      title: "Bulk Grading",
+      description: "Processing multiple submissions for grading.",
+    });
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -228,8 +242,15 @@ export default function DigitalEvaluation() {
         <TabsContent value="grading" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
             <CardHeader>
-              <CardTitle>Grading Queue</CardTitle>
-              <CardDescription>Student submissions waiting for evaluation</CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Grading Queue</CardTitle>
+                  <CardDescription>Student submissions waiting for evaluation</CardDescription>
+                </div>
+                <Button variant="outline" onClick={handleBulkGrade}>
+                  Bulk Grade
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -277,6 +298,13 @@ export default function DigitalEvaluation() {
                             onClick={() => handleGradeSubmission(evaluation.id, 85)}
                           >
                             Submit Grade
+                          </Button>
+                          <Button 
+                            variant="secondary" 
+                            size="sm"
+                            onClick={() => handleAutoGrade(evaluation.id)}
+                          >
+                            Auto Grade
                           </Button>
                           <Button variant="outline" size="sm">
                             View Submission

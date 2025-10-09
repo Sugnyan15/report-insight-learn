@@ -9,6 +9,13 @@ import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import Analytics from "./pages/Analytics";
 import DigitalEvaluation from "./pages/DigitalEvaluation";
+import Students from "./pages/Students";
+import Reports from "./pages/Reports";
+import Calendar from "./pages/Calendar";
+import Messages from "./pages/Messages";
+import Users from "./pages/Users";
+import Settings from "./pages/Settings";
+import CourseCreate from "./pages/CourseCreate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,13 +36,13 @@ const App = () => (
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/evaluation" element={<DigitalEvaluation />} />
-                <Route path="/students" element={<Dashboard />} />
-                <Route path="/reports" element={<Dashboard />} />
-                <Route path="/calendar" element={<Dashboard />} />
-                <Route path="/messages" element={<Dashboard />} />
-                <Route path="/users" element={<Dashboard />} />
-                <Route path="/settings" element={<Dashboard />} />
-                <Route path="/courses/create" element={<Dashboard />} />
+                <Route path="/students" element={<Students />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/courses/create" element={<CourseCreate />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
