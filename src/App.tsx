@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import Header from "./components/layout/Header";
+import ChatBot from "./components/chatbot/ChatBot";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
@@ -56,6 +57,7 @@ const App = () => (
                       </Routes>
                     </main>
                   </div>
+                  <ChatBot />
                 </div>
               </ProtectedRoute>
             }
