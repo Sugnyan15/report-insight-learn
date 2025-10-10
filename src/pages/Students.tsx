@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Search, Plus, Filter, Download, Mail, Phone, MapPin, GraduationCap } from 'lucide-react';
+import { Users, Search, Plus, Filter, Download, Mail, Phone, MapPin, GraduationCap, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -116,7 +116,7 @@ export default function Students() {
           value="89%"
           change="+5%"
           changeType="positive"
-          icon={Badge}
+          icon={Award}
           gradient="bg-gradient-secondary"
         />
         <StatsCard

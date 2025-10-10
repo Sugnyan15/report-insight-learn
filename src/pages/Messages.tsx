@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Send, Search, Plus, Paperclip, Phone, Video } from 'lucide-react';
+import { MessageSquare, Send, Search, Plus, Paperclip, Phone, Video, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -134,7 +134,7 @@ export default function Messages() {
           value="23"
           change="-12%"
           changeType="positive"
-          icon={Badge}
+          icon={Mail}
           gradient="bg-gradient-secondary"
         />
         <StatsCard

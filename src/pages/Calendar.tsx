@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Plus, Clock, Users, MapPin, Video } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Clock, Users, MapPin, Video, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -136,7 +136,7 @@ export default function Calendar() {
           value="6"
           change="+2"
           changeType="positive"
-          icon={Badge}
+          icon={CheckCircle2}
           gradient="bg-gradient-hero"
         />
       </div>
