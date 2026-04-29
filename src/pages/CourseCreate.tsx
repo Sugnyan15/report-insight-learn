@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, Plus, Upload, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,9 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCourseById, addCourse, updateCourse } from '@/lib/courseStorage';
+
 
 export default function CourseCreate() {
+  const { id } = useParams<{ id?: string }>();
+  const isEditMode = !!id;
   const [courseTitle, setCourseTitle] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
   const [instructor, setInstructor] = useState('');
@@ -19,8 +23,43 @@ export default function CourseCreate() {
   const [duration, setDuration] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+
+  // Load course data if editing
+  useEffect(() => {
+    if (isEditMode && id) {
+      const courseId = parseInt(id, 10);
+      const course = getCourseById(courseId);
+      if (course) {
+        setCourseTitle(course.title);
+        setCourseDescription(course.description);
+        // Map instructor name back to select value
+        const instructorValueMap: { [key: string]: string } = {
+          'Dr. Sarah Johnson': 'sarah-johnson',
+          'Prof. Michael Chen': 'michael-chen',
+          'Dr. Emily Rodriguez': 'emily-rodriguez',
+          'Prof. David Wilson': 'david-wilson',
+        };
+        setInstructor(instructorValueMap[course.instructor] || course.instructor);
+        setCategory(course.category.toLowerCase());
+        setLevel(course.level.toLowerCase());
+        setDuration(course.duration);
+        setTags(course.tags || []);
+      } else {
+        toast({
+          title: "Course Not Found",
+          description: "The course you're trying to edit doesn't exist.",
+          variant: "destructive",
+        });
+        navigate('/courses');
+      }
+    }
+  }, [id, isEditMode, navigate, toast]);
+
 
   const handleAddTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -29,9 +68,40 @@ export default function CourseCreate() {
     }
   };
 
+
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFiles(e.target.files);
+      toast({
+        title: "Files Selected",
+        description: `${e.target.files.length} file(s) ready to upload`,
+      });
+    }
+  };
+
+
+  const handleBrowseFiles = () => {
+    fileInputRef.current?.click();
+  };
+
+
+  const handleRemoveFile = (indexToRemove: number) => {
+    if (selectedFiles) {
+      const dt = new DataTransfer();
+      Array.from(selectedFiles).forEach((file, index) => {
+        if (index !== indexToRemove) {
+          dt.items.add(file);
+        }
+      });
+      setSelectedFiles(dt.files.length > 0 ? dt.files : null);
+    }
+  };
+
 
   const handleSaveCourse = () => {
     if (!courseTitle || !courseDescription || !instructor) {
@@ -43,16 +113,81 @@ export default function CourseCreate() {
       return;
     }
 
-    toast({
-      title: "Course Created",
-      description: "Your course has been created successfully.",
-    });
-    navigate('/courses');
+
+    // Map instructor value to full name
+    const instructorMap: { [key: string]: string } = {
+      'sarah-johnson': 'Dr. Sarah Johnson',
+      'michael-chen': 'Prof. Michael Chen',
+      'emily-rodriguez': 'Dr. Emily Rodriguez',
+      'david-wilson': 'Prof. David Wilson',
+    };
+    const instructorName = instructorMap[instructor] || instructor;
+
+
+    // Capitalize category and level
+    const categoryCapitalized = category.charAt(0).toUpperCase() + category.slice(1);
+    const levelCapitalized = level.charAt(0).toUpperCase() + level.slice(1);
+
+
+    if (isEditMode && id) {
+      const courseId = parseInt(id, 10);
+      const updated = updateCourse(courseId, {
+        title: courseTitle,
+        description: courseDescription,
+        instructor: instructorName,
+        category: categoryCapitalized,
+        level: levelCapitalized,
+        duration: duration || 'Not specified',
+        tags: tags,
+      });
+
+
+      if (updated) {
+        toast({
+          title: "Course Updated",
+          description: "Your course has been updated successfully.",
+        });
+        navigate('/courses');
+      } else {
+        toast({
+          title: "Update Failed",
+          description: "Failed to update the course.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      const newCourse = addCourse({
+        title: courseTitle,
+        description: courseDescription,
+        instructor: instructorName,
+        category: categoryCapitalized,
+        level: levelCapitalized,
+        duration: duration || 'Not specified',
+        tags: tags,
+      });
+
+
+      if (newCourse) {
+        toast({
+          title: "Course Created",
+          description: "Your course has been created successfully.",
+        });
+        navigate('/courses');
+      } else {
+        toast({
+          title: "Creation Failed",
+          description: "Failed to create the course.",
+          variant: "destructive",
+        });
+      }
+    }
   };
+
 
   const handleCancel = () => {
     navigate('/courses');
   };
+
 
   return (
     <div className="p-6 space-y-6">
@@ -63,8 +198,12 @@ export default function CourseCreate() {
             <BookOpen className="w-full h-full text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Create New Course</h1>
-            <p className="text-muted-foreground mt-1">Design and configure a new learning module</p>
+            <h1 className="text-3xl font-bold text-foreground">
+              {isEditMode ? 'Edit Course' : 'Create New Course'}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              {isEditMode ? 'Update course details and configuration' : 'Design and configure a new learning module'}
+            </p>
           </div>
         </div>
         <div className="flex space-x-3">
@@ -74,10 +213,11 @@ export default function CourseCreate() {
           </Button>
           <Button variant="gradient" size="lg" onClick={handleSaveCourse}>
             <Save className="mr-2 h-4 w-4" />
-            Create Course
+            {isEditMode ? 'Update Course' : 'Create Course'}
           </Button>
         </div>
       </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Form */}
@@ -138,6 +278,7 @@ export default function CourseCreate() {
               </div>
             </CardContent>
           </Card>
+
 
           {/* Course Configuration */}
           <Card className="bg-gradient-card shadow-elegant border-border/50">
@@ -210,6 +351,7 @@ export default function CourseCreate() {
             </CardContent>
           </Card>
 
+
           {/* Content Upload */}
           <Card className="bg-gradient-card shadow-elegant border-border/50">
             <CardHeader>
@@ -223,10 +365,48 @@ export default function CourseCreate() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Drag and drop files here, or click to browse
                 </p>
-                <Button variant="outline">
+                
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept=".pdf,.docx,.pptx,.mp4,.zip"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
+                
+                <Button variant="outline" onClick={handleBrowseFiles}>
                   <Upload className="mr-2 h-4 w-4" />
                   Choose Files
                 </Button>
+                
+                {/* Display selected files */}
+                {selectedFiles && selectedFiles.length > 0 && (
+                  <div className="mt-4 text-left">
+                    <p className="text-sm font-medium mb-2">Selected Files:</p>
+                    <ul className="text-sm text-muted-foreground space-y-2">
+                      {Array.from(selectedFiles).map((file, index) => (
+                        <li key={index} className="flex items-center justify-between bg-accent/50 p-2 rounded">
+                          <span className="truncate flex-1">{file.name}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs whitespace-nowrap">
+                              ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                            </span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleRemoveFile(index)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
               
               <div className="text-sm text-muted-foreground">
@@ -236,6 +416,7 @@ export default function CourseCreate() {
             </CardContent>
           </Card>
         </div>
+
 
         {/* Sidebar */}
         <div className="space-y-6">
@@ -292,6 +473,7 @@ export default function CourseCreate() {
               )}
             </CardContent>
           </Card>
+
 
           {/* Quick Tips */}
           <Card className="bg-gradient-card shadow-elegant border-border/50">

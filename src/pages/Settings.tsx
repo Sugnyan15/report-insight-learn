@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
+
 export default function Settings() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(false);
@@ -18,12 +19,14 @@ export default function Settings() {
   const [timezone, setTimezone] = useState('UTC-5');
   const { toast } = useToast();
 
+
   const handleSaveSettings = () => {
     toast({
       title: "Settings Saved",
       description: "Your settings have been updated successfully.",
     });
   };
+
 
   return (
     <div className="p-6 space-y-6">
@@ -44,6 +47,7 @@ export default function Settings() {
         </Button>
       </div>
 
+
       {/* Settings Tabs */}
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-6 bg-accent">
@@ -54,6 +58,7 @@ export default function Settings() {
           <TabsTrigger value="system">System</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="profile" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
@@ -108,6 +113,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="notifications" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
@@ -164,6 +170,7 @@ export default function Settings() {
           </Card>
         </TabsContent>
 
+
         <TabsContent value="security" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
             <CardHeader>
@@ -209,6 +216,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="appearance" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
@@ -272,6 +280,7 @@ export default function Settings() {
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="system" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
@@ -343,6 +352,7 @@ export default function Settings() {
           </Card>
         </TabsContent>
 
+
         <TabsContent value="advanced" className="space-y-6">
           <Card className="bg-gradient-card shadow-elegant border-border/50">
             <CardHeader>
@@ -381,9 +391,9 @@ export default function Settings() {
                 <div className="space-y-4">
                   <h4 className="font-semibold text-foreground">Data Management</h4>
                   <div className="flex space-x-2">
-                    <Button variant="outline">Export Data</Button>
-                    <Button variant="outline">Import Data</Button>
-                    <Button variant="destructive">Reset Settings</Button>
+                    <Button variant="outline" className="w-[10%]">Export Data</Button>
+                    <Button variant="outline" className="w-[10%]">Import Data</Button>
+                    <Button variant="destructive" className="w-[10%]">Reset Settings</Button>
                   </div>
                 </div>
               </div>
