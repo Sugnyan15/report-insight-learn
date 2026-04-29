@@ -1,75 +1,93 @@
-import React from 'react';
-import { BookOpen, Users, Clock, Star, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Users, Clock, Star, Plus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { getCourses, deleteCourse, Course } from '@/lib/courseStorage';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import courseAnnualReport from '@/assets/course-annual-report.jpg';
 import courseDataViz from '@/assets/course-data-viz.jpg';
 import courseStrategy from '@/assets/course-strategy.jpg';
 import courseFinance from '@/assets/course-finance.jpg';
 
-const courses = [
-  {
-    id: 1,
-    title: 'Annual Report Analysis 2024',
-    description: 'Comprehensive analysis of institutional performance metrics and financial data',
-    instructor: 'Dr. Sarah Johnson',
-    students: 156,
-    duration: '8 weeks',
-    progress: 75,
-    rating: 4.8,
-    category: 'Analytics',
-    level: 'Intermediate',
-    thumbnail: courseAnnualReport
-  },
-  {
-    id: 2,
-    title: 'Data Visualization for Reports',
-    description: 'Learn to create compelling visual representations of institutional data',
-    instructor: 'Prof. Michael Chen',
-    students: 89,
-    duration: '6 weeks',
-    progress: 45,
-    rating: 4.9,
-    category: 'Visualization',
-    level: 'Beginner',
-    thumbnail: courseDataViz
-  },
-  {
-    id: 3,
-    title: 'Strategic Planning with Analytics',
-    description: 'Using annual report insights for institutional strategic planning',
-    instructor: 'Dr. Emily Rodriguez',
-    students: 67,
-    duration: '10 weeks',
-    progress: 30,
-    rating: 4.7,
-    category: 'Strategy',
-    level: 'Advanced',
-    thumbnail: courseStrategy
-  },
-  {
-    id: 4,
-    title: 'Financial Performance Metrics',
-    description: 'Deep dive into financial analysis and performance indicators',
-    instructor: 'Prof. David Wilson',
-    students: 124,
-    duration: '12 weeks',
-    progress: 60,
-    rating: 4.6,
-    category: 'Finance',
-    level: 'Advanced',
-    thumbnail: courseFinance
-  }
-];
+// Default thumbnails mapping
+const defaultThumbnails: { [key: string]: string } = {
+  'Analytics': courseAnnualReport,
+  'Visualization': courseDataViz,
+  'Strategy': courseStrategy,
+  'Finance': courseFinance,
+};
 
 export default function Courses() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
+
+  // Load courses from localStorage
+  useEffect(() => {
+    loadCourses();
+  }, [location.pathname]); // Reload when navigating back to this page
+
+  const loadCourses = () => {
+    const loadedCourses = getCourses();
+    setCourses(loadedCourses);
+  };
 
   const handleCreateCourse = () => {
     navigate('/courses/create');
+  };
+
+  const handleEditCourse = (id: number) => {
+    navigate(`/courses/edit/${id}`);
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setCourseToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (courseToDelete !== null) {
+      const success = deleteCourse(courseToDelete);
+      if (success) {
+        toast({
+          title: "Course Deleted",
+          description: "The course has been deleted successfully.",
+        });
+        loadCourses(); // Reload courses
+      } else {
+        toast({
+          title: "Delete Failed",
+          description: "Failed to delete the course.",
+          variant: "destructive",
+        });
+      }
+      setDeleteDialogOpen(false);
+      setCourseToDelete(null);
+    }
+  };
+
+  const getThumbnail = (course: Course): string => {
+    if (course.thumbnail) {
+      return course.thumbnail;
+    }
+    // Use default thumbnail based on category
+    return defaultThumbnails[course.category] || courseAnnualReport;
   };
   return (
     <div className="p-6 space-y-6">
@@ -93,7 +111,7 @@ export default function Courses() {
               {/* Course Thumbnail */}
               <div className="h-32 rounded-lg overflow-hidden mb-4 group-hover:scale-105 transition-transform duration-300 relative">
                 <img 
-                  src={course.thumbnail} 
+                  src={getThumbnail(course)} 
                   alt={course.title}
                   className="w-full h-full object-cover"
                 />
@@ -125,26 +143,26 @@ export default function Courses() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress</span>
-                  <span className="font-medium">{course.progress}%</span>
+                  <span className="font-medium">{course.progress || 0}%</span>
                 </div>
-                <Progress value={course.progress} className="h-2" />
+                <Progress value={course.progress || 0} className="h-2" />
               </div>
               
               {/* Course Info */}
               <div className="space-y-3">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Users className="mr-2 h-4 w-4" />
-                  {course.students} students
+                  {course.students || 0} students
                 </div>
                 
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Clock className="mr-2 h-4 w-4" />
-                  {course.duration}
+                  {course.duration || 'Not specified'}
                 </div>
                 
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Star className="mr-2 h-4 w-4 fill-current text-warning" />
-                  {course.rating} rating
+                  {course.rating || 0} rating
                 </div>
               </div>
               
@@ -155,11 +173,29 @@ export default function Courses() {
               
               {/* Actions */}
               <div className="flex space-x-2 pt-2">
-                <Button variant="default" size="sm" className="flex-1">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleEditCourse(course.id)}
+                >
                   View Course
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleEditCourse(course.id)}
+                >
+                  <Edit className="mr-1 h-3 w-3" />
                   Edit
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleDeleteClick(course.id)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
             </CardContent>
@@ -197,6 +233,28 @@ export default function Courses() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the course
+              and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

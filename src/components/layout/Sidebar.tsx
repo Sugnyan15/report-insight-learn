@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Courses', href: '/courses', icon: BookOpen },
@@ -25,11 +26,13 @@ const navigation = [
   { name: 'Users', href: '/users', icon: Users },
 ];
 
+
 export default function Sidebar() {
   const location = useLocation();
 
+
   return (
-    <div className="bg-gradient-card border-r border-border w-64 min-h-screen shadow-elegant">
+    <div className="bg-gradient-card border-r border-border w-64 min-h-screen shadow-elegant flex flex-col relative">
       {/* Logo Section */}
       <div className="p-6 border-b border-border bg-gradient-primary">
         <div className="flex items-center space-x-3">
@@ -43,8 +46,9 @@ export default function Sidebar() {
         </div>
       </div>
 
+
       {/* Navigation */}
-      <nav className="p-4 space-y-2">
+      <nav className="p-4 space-y-2 flex-1">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -71,8 +75,9 @@ export default function Sidebar() {
         })}
       </nav>
 
+
       {/* Bottom Section */}
-      <div className="absolute bottom-4 left-4 right-4">
+      <div className="p-4">
         <NavLink
           to="/settings"
           className={cn(
