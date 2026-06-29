@@ -226,7 +226,7 @@ export default function Calendar() {
   const todayEvents = events.filter(e => e.date === new Date().toISOString().split('T')[0]);
   const upcomingEvents = events
     .filter(e => new Date(e.date) > new Date())
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 5);
 
   // Calculate stats
